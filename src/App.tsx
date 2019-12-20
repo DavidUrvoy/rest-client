@@ -1,5 +1,5 @@
 import React from 'react';
-import './App.css';
+import './App.scss';
 import Request from './components/Request';
 import {Response} from './components/Response';
 
@@ -17,7 +17,7 @@ export default class App extends React.Component<Props, State> {
     onResponseChange = (responseBody: string) => this.setState({responseBody})
 
     render = () => (
-        <div className="divStyle">
+        <div className="rest-form">
             <Request onResponseChange={this.onResponseChange}></Request>
             <Response body={this.state.responseBody}></Response>
         </div>

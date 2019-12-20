@@ -1,16 +1,12 @@
-import React, {Fragment} from 'react';
+import React from 'react';
+import './HttpForms.scss';
 
 interface Props {body: string}
 
 export const Response = ({body}: Props) => (
-    <Fragment>
+    <div className="form-bloc">
         Response :
-        <textarea style={responseStyle} value={body} readOnly></textarea>
-    </Fragment>
+        <textarea className="json-body" value={body} readOnly></textarea>
+    </div>
 )
 
-const responseStyle = {
-    minHeight: '200px',
-    minWidth: '200px',
-    width: '80%'
-}
