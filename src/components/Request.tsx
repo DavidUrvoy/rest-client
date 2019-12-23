@@ -7,10 +7,10 @@ interface Props {onResponseChange: (response: string) => void}
 interface State {
     url: string
     method: HttpMethod
+    body?: string
 }
 
 export default class Request extends Component<Props, State> {
-    body?: string
 
     constructor(props: Props) {
         super(props)
@@ -22,22 +22,22 @@ export default class Request extends Component<Props, State> {
 
     onUrlChange = (event: React.FormEvent<HTMLInputElement>) => this.setState({url: (event.target as HTMLTextAreaElement).value})
 
-    onRequestBodyChange = (event: React.FormEvent<HTMLTextAreaElement>) => this.body = (event.target as HTMLTextAreaElement).value
+    onRequestBodyChange = (event: React.FormEvent<HTMLTextAreaElement>) => this.setState({body: (event.target as HTMLTextAreaElement).value})
 
-    onHttpMethodChange = (event: React.FormEvent<HTMLSelectElement>) => (
+    onHttpMethodChange = (event: React.FormEvent<HTMLSelectElement>) => {
         this.setState({
             method: (event.target as HTMLSelectElement).value as HttpMethod
         })
-    )
+    }
 
     executeRequest = () => fetch(this.state.url, {
-        ...this,
+        ...this.state,
         mode: 'cors',
         cache: 'default',
         headers: new Headers({"Content-type": "application/json; charset=UTF-8"})
     })
         .then(response => response.json())
-        .then(json => this.props.onResponseChange(JSON.stringify(json)))
+        .then(json => this.props.onResponseChange(JSON.stringify(json, undefined, 4)))
         .catch(error => this.props.onResponseChange(error))
 
     render = () => {
