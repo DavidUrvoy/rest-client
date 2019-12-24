@@ -18,8 +18,8 @@ export default class App extends React.Component<Props, State> {
 
     render = () => (
         <div className="rest-form">
-            <Request onResponseChange={this.onResponseChange}></Request>
-            <Response body={this.state.responseBody}></Response>
+            <Request onResponseChange={this.onResponseChange} />
+            <Response body={this.state.responseBody} />
         </div>
   );
 }

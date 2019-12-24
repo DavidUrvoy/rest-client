@@ -1,40 +1,46 @@
 import React, {Component} from 'react';
 import {HttpMethod} from '../domain/HttpMethod';
 import './HttpForms.scss';
+import ListHeaders from './header/ListHeaders';
+import {Header} from '../domain/Header';
 
 interface Props {onResponseChange: (response: string) => void}
-
 interface State {
-    url: string
-    method: HttpMethod
-    body?: string
+    url: string, method: HttpMethod,
+    body?: string,
+    headers: Map<string, string>
 }
 
 export default class Request extends Component<Props, State> {
-
+    
     constructor(props: Props) {
         super(props)
         this.state = {
-            url: "https://jsonplaceholder.typicode.com/todos/1",
+            headers: new Map<string, string>(),
+            url: '',
             method: HttpMethod.GET
         }
     }
 
-    onUrlChange = (event: React.FormEvent<HTMLInputElement>) => this.setState({url: (event.target as HTMLTextAreaElement).value})
-
-    onRequestBodyChange = (event: React.FormEvent<HTMLTextAreaElement>) => this.setState({body: (event.target as HTMLTextAreaElement).value})
-
-    onHttpMethodChange = (event: React.FormEvent<HTMLSelectElement>) => {
-        this.setState({
-            method: (event.target as HTMLSelectElement).value as HttpMethod
-        })
+    setHeader = ({key, value}: Header) => this.setState(({headers}) => ({headers: headers.set(key, value)}))
+    deleteHeader = (key: string): boolean => {
+        const headers = new Map(this.state.headers)
+        const deleted = headers.delete(key)
+        this.setState({headers})
+        return deleted
     }
+
+    handleUrlChange = (event: React.FormEvent<HTMLInputElement>) => this.setState({url: (event.target as HTMLTextAreaElement).value})
+
+    handleRequestBodyChange = (event: React.FormEvent<HTMLTextAreaElement>) => this.setState({body: (event.target as HTMLTextAreaElement).value})
+
+    handleHttpMethodChange = (event: React.FormEvent<HTMLSelectElement>) => this.setState({method: (event.target as HTMLSelectElement).value as HttpMethod})
 
     executeRequest = () => fetch(this.state.url, {
         ...this.state,
         mode: 'cors',
         cache: 'default',
-        headers: new Headers({"Content-type": "application/json; charset=UTF-8"})
+        headers: Array.from(this.state.headers.entries())
     })
         .then(response => response.json())
         .then(json => this.props.onResponseChange(JSON.stringify(json, undefined, 4)))
@@ -46,14 +52,16 @@ export default class Request extends Component<Props, State> {
         <div className="form-bloc">
             Request :
             <div>
-                <select onChange={this.onHttpMethodChange}>
+                <select onChange={this.handleHttpMethodChange}>
                     {Object.keys(HttpMethod).map((method, i) => (<option key={i}>{method}</option>))}
-                </select>
-                <input type="text" value={this.state.url} onChange={this.onUrlChange} />
+                    </select>
+                    <input type="text" value={this.state.url} onChange={this.handleUrlChange} />
                     <button onClick={this.executeRequest}>GO !</button>
                 </div>
-                <textarea onChange={this.onRequestBodyChange} className="json-body" disabled={bodyless}></textarea>
+                <ListHeaders headers={this.state.headers} setHeader={this.setHeader} deleteHeader={this.deleteHeader} />
+                <textarea onChange={this.handleRequestBodyChange} className="json-body" disabled={bodyless}></textarea>
         </div>
         )
     }
 }
+
