@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Header as HeaderType, EMPTY_HEADER} from '../../domain/Header';
+import {Header as HeaderType, EMPTY_HEADER} from '../../../domain/Header';
 import Header from './Header';
 
 interface Props {headers: Map<string, string>, setHeader: (header: HeaderType) => void, deleteHeader: (key: string) => boolean}
