@@ -3,10 +3,12 @@ import {HttpMethod} from '../domain/HttpMethod';
 import './HttpForms.scss';
 import ListHeaders from './header/ListHeaders';
 import {Header} from '../domain/Header';
+import {EMPTY_REQUEST} from '../domain/HttpRequest';
 
-interface Props {onResponseChange: (response: string) => void}
+interface Props {}
 interface State {
-    url: string, method: HttpMethod,
+    url: string,
+    method: HttpMethod,
     body?: string,
     headers: Map<string, string>
 }
@@ -15,11 +17,7 @@ export default class Request extends Component<Props, State> {
     
     constructor(props: Props) {
         super(props)
-        this.state = {
-            headers: new Map<string, string>(),
-            url: '',
-            method: HttpMethod.GET
-        }
+        this.state = {...EMPTY_REQUEST}
     }
 
     setHeader = ({key, value}: Header) => this.setState(({headers}) => ({headers: headers.set(key, value)}))
@@ -36,16 +34,6 @@ export default class Request extends Component<Props, State> {
 
     handleHttpMethodChange = (event: React.FormEvent<HTMLSelectElement>) => this.setState({method: (event.target as HTMLSelectElement).value as HttpMethod})
 
-    executeRequest = () => fetch(this.state.url, {
-        ...this.state,
-        mode: 'cors',
-        cache: 'default',
-        headers: Array.from(this.state.headers.entries())
-    })
-        .then(response => response.json())
-        .then(json => this.props.onResponseChange(JSON.stringify(json, undefined, 4)))
-        .catch(error => this.props.onResponseChange(error))
-
     render = () => {
         const bodyless = this.state.method === 'GET' || this.state.method === 'HEAD'
         return (
@@ -56,7 +44,6 @@ export default class Request extends Component<Props, State> {
                     {Object.keys(HttpMethod).map((method, i) => (<option key={i}>{method}</option>))}
                     </select>
                     <input type="text" value={this.state.url} onChange={this.handleUrlChange} />
-                    <button onClick={this.executeRequest}>GO !</button>
                 </div>
                 <ListHeaders headers={this.state.headers} setHeader={this.setHeader} deleteHeader={this.deleteHeader} />
                 <textarea onChange={this.handleRequestBodyChange} className="json-body" disabled={bodyless}></textarea>
