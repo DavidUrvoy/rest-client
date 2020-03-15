@@ -2,22 +2,28 @@ import React, {Component} from 'react';
 import {HttpMethod} from '../../domain/HttpMethod';
 import './HttpForms.scss';
 import ListHeaders from './header/ListHeaders';
-import {Header} from '../../domain/Header';
 import HttpRequest from '../../domain/HttpRequest';
+//import Header from './header/Header';
 
 type Props = {id: number, onResponseChange: (response: string) => void} & HttpRequest
 interface State {}
 
 export default class Request extends Component<Props, State> {
-    
-    constructor(props: Props) {
-        super(props)
-        this.state = {
-            headers: new Map<string, string>(),
-            url: '',
-            method: HttpMethod.GET
-        }
+
+    // todo to be removed
+    //setHeader = ({key, value}: Header) => this.setState(({headers}) => ({headers: headers.set(key, value)}))
+    deleteHeader = (key: string): boolean => {
+        const headers = new Map(this.props.headers)
+        const deleted = headers.delete(key)
+        this.setState({headers})
+        return deleted
     }
+
+    handleUrlChange = (event: React.FormEvent<HTMLInputElement>) => this.setState({url: (event.target as HTMLTextAreaElement).value})
+
+    handleRequestBodyChange = (event: React.FormEvent<HTMLTextAreaElement>) => this.setState({body: (event.target as HTMLTextAreaElement).value})
+
+    handleHttpMethodChange = (event: React.FormEvent<HTMLSelectElement>) => this.setState({method: (event.target as HTMLSelectElement).value as HttpMethod})
 
     executeRequest = () => fetch(this.props.url, {
         ...this.props,
